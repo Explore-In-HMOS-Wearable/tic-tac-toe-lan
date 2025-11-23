@@ -12,7 +12,7 @@ interface PairResponse {
 @Entry
 @Component
 struct Index {
-  @State pairAddressInput: string = 'http://10.0.2.2:';
+  @State pairAddressInput: string = '';
   @State mode: 'host' | 'client' = 'client';
   @State pairAddress: string = '';
   @State game: GameState = new GameState();
@@ -33,7 +33,7 @@ struct Index {
         this.logs.push('Pairing with ' + this.pairAddress)
         this.game = new GameState();
         this.paired = true;
-        this.playerPen = Math.random() > 0.5 ? 'X' : 'O';
+        this.playerPen = dateRnd() > 0.5 ? 'X' : 'O';
         this.showGameStartInfo = true;
         setTimeout(() => {
           this.showGameStartInfo = false;
@@ -67,7 +67,7 @@ struct Index {
 
   pair() {
     this.logs.push('Sending pair request to' + this.pairAddressInput)
-    const me = 'http://10.0.2.2:6060'
+    const me = '' // Write other IP Address
     this.session.post(this.pairAddressInput + '/pair', me)
       .then((response) => {
         this.pairAddress = this.pairAddressInput;
@@ -81,7 +81,6 @@ struct Index {
         }, 3000)
       })
       .catch((err: BusinessError) => {
-        console.log(JSON.stringify(err))
       })
   }
 
@@ -89,10 +88,8 @@ struct Index {
     this.logs.push('Sending sync request to' + this.pairAddressInput)
     this.session.post(this.pairAddress + '/sync', this.game.serialize())
       .then((response) => {
-        console.log('Game state synced.')
       })
       .catch((err: BusinessError) => {
-        console.log(JSON.stringify(err))
       });
   }
 
@@ -278,4 +275,8 @@ struct Index {
       this.PairScreen();
     }
   }
+}
+
+function dateRnd() {
+  return (Date.now() % 1000) / 1000;
 }
